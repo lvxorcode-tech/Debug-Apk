@@ -1,0 +1,32 @@
+name: Build Debug APK dari HP
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch: # Ini memungkinkan Anda menjalankan build manual dengan tombol
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # GitHub akan menggunakan server Ubuntu
+
+    steps:
+      - name: 📥 1. Ambil kode dari repository
+        uses: actions/checkout@v4
+
+      - name: ☕ 2. Siapkan Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17' # Sesuaikan dengan versi Java project Anda
+
+      - name: 🔧 3. Beri izin eksekusi gradlew
+        run: chmod +x ./gradlew
+
+      - name: 🏗️ 4. Bangun APK Debug
+        run: ./gradlew assembleDebug
+
+      - name: 📦 5. Unggah APK sebagai Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-apk-cyan
+          path: app/build/outputs/apk/debug/app-debug.apk
