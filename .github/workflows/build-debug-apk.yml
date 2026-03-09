@@ -1,0 +1,40 @@
+name: Build Debug APK
+
+on:
+  push:
+    branches: [ master, main ]  # Workflow akan jalan ketika ada push ke branch master atau main
+  pull_request:
+    branches: [ master, main ]  # Juga jalan untuk pull request ke branch tersebut
+  workflow_dispatch: # Memungkinkan Anda menjalankan workflow manual dari tab Actions
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Mendownload kode dari repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Menyiapkan JDK (Java Development Kit)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # 3. Memberikan izin eksekusi pada file Gradle wrapper
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      # 4. Membangun APK Debug
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug
+
+      # 5. Mengupload APK yang sudah jadi sebagai artifact
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-debug-apk
+          path: app/build/outputs/apk/debug/ # Lokasi default APK debug
+          if-no-files-found: error # Akan error jika file APK tidak ditemukan
